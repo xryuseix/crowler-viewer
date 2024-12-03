@@ -8,6 +8,7 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 	"net/http"
 	"os"
+	"strings"
 )
 
 //go:embed all:frontend/dist
@@ -22,7 +23,7 @@ func NewFileLoader() *FileLoader {
 }
 
 func (h *FileLoader) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	requestedFilename := req.URL.Path
+	requestedFilename := strings.TrimPrefix(req.URL.Path, "/")
 	println("Requesting file:", requestedFilename)
 	fileData, err := os.ReadFile(requestedFilename)
 	if err != nil {
@@ -34,10 +35,10 @@ func (h *FileLoader) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
-	// Create an instance of the app structure
 	app := NewApp()
 
-	// Create application with options
+	LoadEnv()
+
 	err := wails.Run(&options.App{
 		Title:  "crowler-viewer",
 		Width:  1024,
