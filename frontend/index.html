@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta http-equiv="Content-Language" content="ja" />
+    <meta name="google" content="notranslate" />
+    <title>crowler-viewer</title>
+  </head>
+  <body style="overscroll-behavior-x: none">
+    <div id="root"></div>
+    <script src="./src/main.tsx" type="module"></script>
+    <script>
+      history.pushState(null, null, null);
+      window.addEventListener("popstate", (e) => {
+        history.pushState(null, null, null);
+        e.preventDefault();
+      });
+      window.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+      });
+    </script>
+  </body>
+</html>
