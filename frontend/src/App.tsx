@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { GetScreenShotPaths, Logging } from "../wailsjs/go/main/App";
+import { GetScreenShotPaths, SaveSSPath } from "../wailsjs/go/main/App";
+import toast, { Toaster } from "react-hot-toast";
 import "./App.css";
 
 function App() {
@@ -7,11 +8,14 @@ function App() {
   const [ssIdx, setSSIdx] = useState(0);
 
   useEffect(() => {
-    GetScreenShotPaths().then(setSSpaths).catch(console.error);
+    GetScreenShotPaths()
+      .then(setSSpaths)
+      .catch((err) => {
+        notify(`Failed to get screenshot paths: ${err}`, "error");
+      });
   }, []);
 
   const prev = useCallback(() => {
-    Logging(`ssIdx: ${ssIdx}, ssPaths.length: ${ssPaths.length}`);
     if (ssPaths.length === 0) {
       return;
     }
@@ -23,13 +27,38 @@ function App() {
   }, [ssIdx, ssPaths.length]);
 
   const next = useCallback(() => {
-    Logging(`ssIdx: ${ssIdx}, ssPaths.length: ${ssPaths.length}`);
     if (ssIdx + 1 >= ssPaths.length) {
       setSSIdx(0);
     } else {
       setSSIdx(ssIdx + 1);
     }
   }, [ssIdx, ssPaths.length]);
+
+  const save = useCallback(() => {
+    SaveSSPath(ssPaths[ssIdx])
+      .then((savePath) => {
+        notify(`Saved successfully to ${savePath}`, "success");
+      })
+      .catch((err) => {
+        notify(`Failed to save screenshot path: ${err}`, "error");
+      });
+  }, [ssIdx, ssPaths]);
+
+  const notify = (msg: string, status?: "success" | "error") => {
+    if (status === "error") {
+      toast.error(msg, {
+        icon: "❌",
+      });
+      return;
+    }
+    if (status === "success") {
+      toast(msg, {
+        icon: "✅",
+      });
+      return;
+    }
+    toast(msg);
+  };
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -47,31 +76,31 @@ function App() {
     };
   }, [prev, next]);
 
-
   return (
-    <div id="App">
-      {ssPaths.length > 0 && ssIdx < ssPaths.length && (
-        <img
-          id="image"
-          src={`/images/${ssPaths[ssIdx]}`}
-          style={{ width: "80vw" }}
-          alt="app icon"
-        />
-      )}
+    <div id="app">
+      <Toaster position="bottom-right" reverseOrder={false} />
+      <div id="title">{ssPaths.length > 0 && ssPaths[ssIdx]}</div>
+      <div id="image">
+        {ssPaths.length > 0 && ssIdx < ssPaths.length && (
+          <img
+            id="image"
+            src={`/images/${ssPaths[ssIdx]}`}
+            style={{ width: "80vw" }}
+            alt="app icon"
+          />
+        )}
+      </div>
       <div id="input" className="input-box">
         <button className="btn" onClick={prev} type="button">
-          Prev
+          👈 Prev
+        </button>
+        <button className="btn" onClick={save} type="button">
+          💾 Save
         </button>
         <button className="btn" onClick={next} type="button">
-          Next
+          Next 👉
         </button>
       </div>
-      <div id="result" className="result">
-        {ssPaths.map((path) => (
-          <p key={path}>{path}</p>
-        ))}
-      </div>
-      <p>idx: {ssIdx}</p>
     </div>
   );
 }
