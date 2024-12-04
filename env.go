@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -9,7 +8,8 @@ import (
 )
 
 type Env struct {
-	OutDir string
+	OutDir   string
+	SaveFile string
 }
 
 var env *Env
@@ -24,7 +24,11 @@ func LoadEnv() {
 	if outDir == "" {
 		log.Fatal("OUT_DIR is not set")
 	}
-	fmt.Println("OUT_DIR: ", outDir)
 
-	env = &Env{OutDir: outDir}
+	saveFile := os.Getenv("SAVE_FILE")
+	if saveFile == "" {
+		saveFile = "marked.txt"
+	}
+
+	env = &Env{OutDir: outDir, SaveFile: saveFile}
 }
