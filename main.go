@@ -23,7 +23,12 @@ func NewFileLoader() *FileLoader {
 }
 
 func (h *FileLoader) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	requestedFilename := strings.TrimPrefix(req.URL.Path, "/")
+	var requestedFilename string
+	if strings.HasPrefix(req.URL.Path, "/images/") {
+		requestedFilename = strings.TrimPrefix(req.URL.Path, "/images")
+	} else {
+		requestedFilename = strings.TrimPrefix(req.URL.Path, "/")
+	}
 	println("Requesting file:", requestedFilename)
 	fileData, err := os.ReadFile(requestedFilename)
 	if err != nil {
