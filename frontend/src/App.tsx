@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { GetScreenShotPaths, Logging } from "../wailsjs/go/main/App";
 import "./App.css";
-import { GetScreenShotPaths } from "../wailsjs/go/main/App";
 
 function App() {
   const [ssPaths, setSSpaths] = useState<string[]>([]);
@@ -10,21 +10,43 @@ function App() {
     GetScreenShotPaths().then(setSSpaths).catch(console.error);
   }, []);
 
-  const prev = () => {
+  const prev = useCallback(() => {
+    Logging(`ssIdx: ${ssIdx}, ssPaths.length: ${ssPaths.length}`);
+    if (ssPaths.length === 0) {
+      return;
+    }
     if (ssIdx - 1 < 0) {
       setSSIdx(ssPaths.length - 1);
     } else {
       setSSIdx(ssIdx - 1);
     }
-  };
+  }, [ssIdx, ssPaths.length]);
 
-  const next = () => {
+  const next = useCallback(() => {
+    Logging(`ssIdx: ${ssIdx}, ssPaths.length: ${ssPaths.length}`);
     if (ssIdx + 1 >= ssPaths.length) {
       setSSIdx(0);
     } else {
       setSSIdx(ssIdx + 1);
     }
-  };
+  }, [ssIdx, ssPaths.length]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "ArrowRight") {
+        next();
+      } else if (event.key === "ArrowLeft") {
+        prev();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [prev, next]);
+
 
   return (
     <div id="App">
@@ -32,7 +54,7 @@ function App() {
         <img
           id="image"
           src={`/images/${ssPaths[ssIdx]}`}
-          style={{ width: "300px" }}
+          style={{ width: "80vw" }}
           alt="app icon"
         />
       )}
