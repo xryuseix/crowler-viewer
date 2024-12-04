@@ -21,7 +21,7 @@ body {
 }
 
 #app {
-  height: 100vh;
+  height: calc(100vh - 3%); 
   text-align: center;
   padding: 3%;
 }
