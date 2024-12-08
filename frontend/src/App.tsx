@@ -82,26 +82,27 @@ function App() {
     };
   }, [prev, next]);
 
+  if (loading) {
+    return (
+      <div
+        id="loading"
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <ReactLoading />
+      </div>
+    );
+  }
+
   return (
     <div id="app">
-      {loading && (
-        <div
-          id="loading"
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <ReactLoading />
-        </div>
-      )}
       <Toaster position="bottom-right" reverseOrder={false} />
-      <div
-        id="title"
-        style={{ textAlign: "center", overflowWrap: "break-word" }}
-      >
-        {ssPaths.length > 0 && ssPaths[ssIdx]}
+      <div id="title" style={{ textAlign: "center", overflowWrap: "anywhere" }}>
+        <span style={{ marginRight: "5px" }}>[{ssIdx}]</span>
+        <span>{ssPaths[ssIdx]}</span>
       </div>
       <div id="image">
         {ssPaths.length > 0 && ssIdx < ssPaths.length && (
@@ -123,6 +124,26 @@ function App() {
         <button className="btn" onClick={next} type="button">
           Next 👉
         </button>
+      </div>
+      <div style={{ marginTop: "10px" }}>
+        <input
+          type="number"
+          value={ssIdx}
+          onChange={(e) => {
+            const idx = Number.parseInt(e.target.value);
+            if(Number.isNaN(idx)) {
+              return
+            }
+            if (idx < 0) {
+              setSSIdx(0);
+              return;
+            }
+            if (idx >= ssPaths.length) {
+              setSSIdx(ssPaths.length - 1);
+              return;
+            }
+            setSSIdx(Number.parseInt(e.target.value))}}
+        />
       </div>
     </div>
   );
