@@ -1,18 +1,22 @@
 import { useCallback, useEffect, useState } from "react";
 import { GetScreenShotPaths, SaveSSPath } from "../wailsjs/go/main/App";
 import toast, { Toaster } from "react-hot-toast";
+import ReactLoading from "react-loading";
 import "./App.css";
 
 function App() {
   const [ssPaths, setSSpaths] = useState<string[]>([]);
   const [ssIdx, setSSIdx] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     GetScreenShotPaths()
       .then(setSSpaths)
       .catch((err) => {
         notify(`Failed to get screenshot paths: ${err}`, "error");
       });
+    setLoading(false);
   }, []);
 
   const prev = useCallback(() => {
@@ -78,15 +82,32 @@ function App() {
 
   return (
     <div id="app">
+      {loading && (
+        <div
+          id="loading"
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <ReactLoading />
+        </div>
+      )}
       <Toaster position="bottom-right" reverseOrder={false} />
-      <div id="title">{ssPaths.length > 0 && ssPaths[ssIdx]}</div>
+      <div
+        id="title"
+        style={{ textAlign: "center", overflowWrap: "break-word" }}
+      >
+        {ssPaths.length > 0 && ssPaths[ssIdx]}
+      </div>
       <div id="image">
         {ssPaths.length > 0 && ssIdx < ssPaths.length && (
           <img
             id="image"
-            src={`/images/${ssPaths[ssIdx]}`}
+            src={`/images${encodeURI(ssPaths[ssIdx])}`}
             style={{ width: "80vw" }}
-            alt="app icon"
+            alt="screenshot"
           />
         )}
       </div>
