@@ -101,7 +101,7 @@ function App() {
     <div id="app">
       <Toaster position="bottom-right" reverseOrder={false} />
       <div id="title" style={{ textAlign: "center", overflowWrap: "anywhere" }}>
-        <span style={{ marginRight: "5px" }}>[{ssIdx}]</span>
+        <span style={{ marginRight: "5px" }}>[{ssIdx}/{ssPaths.length}]</span>
         <span>{ssPaths[ssIdx]}</span>
       </div>
       <div id="image">
