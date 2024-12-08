@@ -13,10 +13,12 @@ function App() {
     setLoading(true);
     GetScreenShotPaths()
       .then(setSSpaths)
+      .then(() => {
+        setLoading(false);
+      })
       .catch((err) => {
         notify(`Failed to get screenshot paths: ${err}`, "error");
       });
-    setLoading(false);
   }, []);
 
   const prev = useCallback(() => {
