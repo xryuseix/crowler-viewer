@@ -29,9 +29,10 @@ func (h *FileLoader) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	} else {
 		requestedFilename = strings.TrimPrefix(req.URL.Path, "/")
 	}
-	println("Requesting file:", requestedFilename)
+
 	fileData, err := os.ReadFile(requestedFilename)
 	if err != nil {
+		fmt.Println("error: Could not load file", err)
 		res.WriteHeader(http.StatusBadRequest)
 		res.Write([]byte(fmt.Sprintf("Could not load file %s", requestedFilename)))
 	}
