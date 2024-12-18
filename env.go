@@ -10,6 +10,7 @@ import (
 type Env struct {
 	OutDir   string
 	SaveFile string
+	TrashDir string
 }
 
 var env *Env
@@ -30,5 +31,5 @@ func LoadEnv() {
 		saveFile = "marked.txt"
 	}
 
-	env = &Env{OutDir: outDir, SaveFile: saveFile}
+	env = &Env{OutDir: outDir, SaveFile: saveFile, TrashDir: os.Getenv("TRASH_DIR")}
 }

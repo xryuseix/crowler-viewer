@@ -1,11 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"io/fs"
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 func (a *App) GetScreenShotPaths() ([]string, error) {
@@ -43,4 +45,20 @@ func (a *App) SaveSSPath(path string) string {
 	}
 
 	return env.SaveFile
+}
+
+func (a *App) DeletePhishData(path string) {
+	path = strings.TrimSuffix(path, "/screenshot.png")
+	dirName := filepath.Base(path)
+	if env.TrashDir != "" {
+		if err := os.CopyFS(fmt.Sprintf("%s/%s", env.TrashDir, dirName), os.DirFS(path)); err != nil {
+			log.Printf("[ERROR] failed copying file: %s", err)
+			return
+		}
+	}
+	if err := os.RemoveAll(path); err != nil {
+		log.Printf("[ERROR] failed opening or creating file: %s", err)
+		return
+	}
+	fmt.Println("[INFO] Deleted: ", path)
 }

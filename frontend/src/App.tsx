@@ -1,5 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
-import { GetScreenShotPaths, SaveSSPath } from "../wailsjs/go/main/App";
+import {
+  GetScreenShotPaths,
+  SaveSSPath,
+  DeletePhishData,
+} from "../wailsjs/go/main/App";
 import toast, { Toaster } from "react-hot-toast";
 import ReactLoading from "react-loading";
 import "./App.css";
@@ -50,6 +54,22 @@ function App() {
       });
   }, [ssIdx, ssPaths]);
 
+  const deletePhish = useCallback(() => {
+    const path = ssPaths[ssIdx];
+    const pathTrimed = path.split("/")[path.split("/").length - 2];
+    if (typeof path === "undefined") {
+      return;
+    }
+    DeletePhishData(path)
+      .then(() => {
+        notify(`Deleted ${pathTrimed}`, "success");
+      })
+      .catch((err) => {
+        notify(`Failed to delete phish data: ${err}`, "error");
+      });
+    next();
+  }, [ssIdx, ssPaths, next]);
+
   const notify = (msg: string, status?: "success" | "error") => {
     if (status === "error") {
       toast.error(msg, {
@@ -72,6 +92,10 @@ function App() {
         next();
       } else if (event.key === "ArrowLeft") {
         prev();
+      } else if (event.key === "s") {
+        save();
+      } else if (event.key === "d") {
+        deletePhish();
       }
     };
 
@@ -80,7 +104,7 @@ function App() {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [prev, next]);
+  }, [prev, next, save, deletePhish]);
 
   if (loading) {
     return (
@@ -101,7 +125,9 @@ function App() {
     <div id="app">
       <Toaster position="bottom-right" reverseOrder={false} />
       <div id="title" style={{ textAlign: "center", overflowWrap: "anywhere" }}>
-        <span style={{ marginRight: "5px" }}>[{ssIdx}/{ssPaths.length}]</span>
+        <span style={{ marginRight: "5px" }}>
+          [{ssIdx}/{ssPaths.length}]
+        </span>
         <span>{ssPaths[ssIdx]}</span>
       </div>
       <div id="image">
@@ -121,6 +147,9 @@ function App() {
         <button className="btn" onClick={save} type="button">
           💾 Save
         </button>
+        <button className="btn" onClick={deletePhish} type="button">
+          ❌ Delete
+        </button>
         <button className="btn" onClick={next} type="button">
           Next 👉
         </button>
@@ -131,8 +160,8 @@ function App() {
           value={ssIdx}
           onChange={(e) => {
             const idx = Number.parseInt(e.target.value);
-            if(Number.isNaN(idx)) {
-              return
+            if (Number.isNaN(idx)) {
+              return;
             }
             if (idx < 0) {
               setSSIdx(0);
@@ -142,7 +171,8 @@ function App() {
               setSSIdx(ssPaths.length - 1);
               return;
             }
-            setSSIdx(Number.parseInt(e.target.value))}}
+            setSSIdx(Number.parseInt(e.target.value));
+          }}
         />
       </div>
     </div>
